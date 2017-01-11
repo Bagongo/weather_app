@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html>
+<title>Weather-APP</title>    
+    
+<head> 
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    
+    <script src="https://use.fontawesome.com/c4baa82464.js"></script>        
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>    
+</head>
+
+<style>
+    
+    body{
+        background-image: url("https://wallpaperscraft.com/image/sky_field_gloomy_dark_blue_gleam_bad_weather_53978_2048x1152.jpg");  
+        background-position: center;  
+        background-repeat: no-repeat;
+        background-attachment: fixed;  
+        background-size: cover;
+    }
+    
+    .margin-top{
+        margin-top: 25px;
+    }
+  
+    #flex-container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #head-cont{
+        width: 70%;
+        height: 50px;
+        background-color: azure;
+    }
+    
+    #data-box-cont{
+        width: 50%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    
+    #data-box-cont > div{
+        width: 150px;
+        height: 100px;
+        border-radius: 15px;
+        margin: 15px;
+        background-color: azure;
+    }
+    
+    #search-bar-cont{
+        width: 70%;
+        height: 50px;
+        background-color: azure;
+    }
+    
+    #refresh-btn{
+        width: 50px;
+        height: 50px;
+        background-color: azure;
+    }
+    
+
+</style>
+
+<body>
+    
+    <div id="flex-container">
+        
+        <div id="head-cont" class="margin-top"></div>
+        
+        <div id="data-box-cont" class="margin-top">
+            <div id="icon"></div>
+            <div id="weather"></div>
+            <div id="temp"></div>       
+        </div>
+        
+        <div id="search-bar-cont" class="margin-top"></div>
+        
+        <div id="refresh-btn" class="margin-top"></div>
+       
+        
+    </div>
+    
+
+    <script>        
+        
+    $(window).on("load", function(){
+        
+        var geok = "91eb7c81e4675bcb";        
+        var location = {};
+        var weatherData = {};
+        var weatherIcon = $("<img />").attr('src', '')
+              
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(getLatLong, altGetLatLong);
+            } 
+            else
+            {
+                //handle errors here;
+            }
+        }
+        
+        function getLatLong(position) {
+            
+            var latLong = position.coords.latitude.toString() + "," + position.coords.longitude.toString();
+            reverseGeoCode(latLong);
+        }
+        
+        function altGetLatLong(error) {
+                                    
+            $.get("http://ipinfo.io", function(response) {
+                var latLong = response.loc;
+                reverseGeoCode(latLong);
+            }, "jsonp")           
+        }
+                       
+        function reverseGeoCode(latlong){
+                     
+             var queryLocation = "http://api.wunderground.com/api/"+geok+"/geolookup/q/"+latlong+".json";
+            
+             $.get(queryLocation, function(data){
+                location.country = data.location.country_iso3166;
+                location.city = data.location.city;
+                getWeather(location);
+            });
+        }
+        
+        function getWeather(location)
+        {
+            var queryCond = "http://api.wunderground.com/api/"+geok+"/conditions/q/"+location.country+"/"+location.city+".json";
+            
+            $.get(queryCond, function(data){                
+                weatherData.condition = data.current_observation.weather;
+                weatherData.temps = {
+                                     F : data.current_observation.temp_f + " F",
+                                     C : data.current_observation.temp_c + " C"
+                                    }
+                weatherData.pic = data.current_observation.icon_url.toString();
+                fillDataFields();
+            });
+            
+        }
+        
+        function fillDataFields()
+        {
+            console.log(weatherData);
+        }
+        
+        //getLocation();
+            
+    });
+
+
+    </script>
+    
+</body>
+    
+</html>
