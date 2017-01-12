@@ -37,6 +37,9 @@
     }
     
     #head-cont{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         width: 70%;
         height: 50px;
         background-color: azure;
@@ -46,11 +49,14 @@
         width: 50%;
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: wrap-reverse;
         justify-content: space-around;
     }
     
     #data-box-cont > div{
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 150px;
         height: 100px;
         border-radius: 15px;
@@ -65,9 +71,84 @@
     }
     
     #refresh-btn{
-        width: 50px;
-        height: 50px;
+        position: relative;
+        width: 70px;
+        height: auto;
+        padding: 5px 0;
+        border-radius: 10px;
+        border: 4px solid #1442be;
         background-color: azure;
+    }
+    
+    #refresh-btn > p{
+        text-align: center;
+        margin: 0;
+        font-size: 0.7em;
+        color: #1442be;
+    }
+    
+    #refresh-btn .bar:nth-child(1){
+        width: 40px;
+        height: 8px;
+    }
+    
+    #refresh-btn .bar:nth-child(2){
+        background-color: #5078e5;
+        width: 25px;
+        height: 7px;
+    }
+    
+    #refresh-btn .bar:nth-child(3){
+        width: 15px;
+    }
+    
+    #refresh-btn .bar:nth-child(4){       
+        height: 0px;
+        width: 0px;
+        margin-top: 3px;
+        border: 5px solid #5078e5;
+        border-bottom: 5px solid transparent;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        background-color: transparent;
+    }
+    
+    .bar{
+        position: relative;
+        height: 5px;
+        border-radius: 4px;
+        background-color: #1442be;
+        margin: 2px auto;        
+    }
+    
+    .bar.twist{
+        animation: twitsting 1s alternate;
+        animation-iteration-count: 5;        
+    }
+       
+    .bar.twist-reverse{
+        animation: twitsting 1s alternate-reverse;
+        animation-iteration-count: 5;
+    }
+    
+    @-webkit-keyframes twitsting {
+        from {left: -1px;}
+        to {left: 1px;}
+    }
+
+    @keyframes twitsting {
+        from {left: -1px;}
+        to {left: 1px;}
+    }
+       
+    @media all and (max-width: 1100px) {
+        #icon{order: 3;}
+    }
+    
+    @media all and (max-width: 768px) {
+        #head-cont{width: 90%; height: 100px};
+        #weather{order: 2;}
+        #temp{order: 1};
     }
     
 
@@ -77,17 +158,26 @@
     
     <div id="flex-container">
         
-        <div id="head-cont" class="margin-top"></div>
+        <div id="head-cont" class="margin-top">
+            <h3>The current weather in: </h3>
+            <h4></h4>
+        </div>
         
         <div id="data-box-cont" class="margin-top">
-            <div id="icon"></div>
-            <div id="weather"></div>
-            <div id="temp"></div>       
+            <div id="weather"><p></p></div>
+            <div id="icon"><img src="" /></div>
+            <div id="temp"><p></p></div>       
         </div>
         
         <div id="search-bar-cont" class="margin-top"></div>
         
-        <div id="refresh-btn" class="margin-top"></div>
+        <div id="refresh-btn" class="margin-top">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <p>Get weather</p>
+        </div>
        
         
     </div>
@@ -100,7 +190,21 @@
         var geok = "91eb7c81e4675bcb";        
         var location = {};
         var weatherData = {};
-        var weatherIcon = $("<img />").attr('src', '')
+        
+    
+        $("#refresh-btn").click(function(){
+                
+                //getLocation();
+            
+                $(this).children().eq(0).addClass("twist");
+                $(this).children().eq(1).addClass("twist-reverse");
+                $(this).children().eq(2).addClass("twist");
+                $(this).children().eq(3).addClass("twist-reverse");
+              
+                var newone = $(this).clone(true);
+                $(this).before(newone);        
+                $("." + $(this).attr("class") + ":last").remove();
+        });
               
         function getLocation() {
             if (navigator.geolocation) {
@@ -155,10 +259,14 @@
         
         function fillDataFields()
         {
+            $("#head-cont > h4").html(location.city + ", " + location.country);
             console.log(weatherData);
+            $("#icon > img").attr("src", weatherData.pic);
+            $("#weather > p").html(weatherData.condition);
+            $("#temp > p").html(weatherData.temps.F);
         }
         
-        //getLocation();
+        getLocation();
             
     });
 
